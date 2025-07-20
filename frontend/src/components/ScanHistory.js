@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import ResultDisplay from './ResultDisplay';
 
 const ScanHistory = () => {
@@ -31,9 +31,9 @@ const ScanHistory = () => {
 
   const getClassificationColor = (classification) => {
     switch (classification) {
-      case 'legitimate': return '#34d399';
+      case 'legitimate': return '#22c55e';
       case 'suspicious': return '#fbbf24';
-      case 'spam': return '#fb7185';
+      case 'spam': return '#ec4899';
       case 'phishing': return '#dc2626';
       default: return '#6b7280';
     }
@@ -51,27 +51,47 @@ const ScanHistory = () => {
 
   if (loading) {
     return (
-      <div className="beach-card text-center">
-        <div className="loading-spinner"></div>
-        <p>🌊 Loading your catch history...</p>
+      <div className="page-container">
+        <div className="page-hero">
+          <h1>Scan History</h1>
+          <p>View your email analysis history and track security patterns.</p>
+        </div>
+        <div className="text-center">
+          <div className="loading-spinner"></div>
+          <p>Loading scan history...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="beach-card">
-        <h3>⚠️ Error</h3>
-        <p>{error}</p>
+      <div className="page-container">
+        <div className="page-hero">
+          <h1>Scan History</h1>
+          <p>View your email analysis history and track security patterns.</p>
+        </div>
+        <div className="content-card">
+          <div className="result-box result-suspicious">
+            <h3>⚠️ Error</h3>
+            <p>{error}</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (!history || !history.scans || history.scans.length === 0) {
     return (
-      <div className="beach-card text-center">
-        <h2>📊 Catch Log</h2>
-        <p>🌊 No catches in the log yet. Start fishing for some emails!</p>
+      <div className="page-container">
+        <div className="page-hero">
+          <h1>Scan History</h1>
+          <p>View your email analysis history and track security patterns.</p>
+        </div>
+        <div className="content-card text-center">
+          <h2>No Scans Yet</h2>
+          <p>Start scanning emails to see your history here.</p>
+        </div>
       </div>
     );
   }
@@ -102,131 +122,125 @@ const ScanHistory = () => {
   }));
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-    >
-      <div className="beach-card">
-        <h2>📊 Catch Log</h2>
-        <p>Review your recent catches and security patrol history</p>
+    <div className="page-container">
+      <div className="page-hero">
+        <h1>Scan History</h1>
+        <p>View your email analysis history and track security patterns.</p>
       </div>
 
-      {/* Summary Metrics */}
-      <div className="beach-card">
-        <h3>🏖️ Summary</h3>
-        <div className="metrics-grid">
-          <div className="metric-card">
-            <div className="metric-value">{totalScans}</div>
-            <div className="metric-label">Total Catches</div>
-          </div>
-          <div className="metric-card">
-            <div className="metric-value">{recentScans}</div>
-            <div className="metric-label">Recent Catches</div>
-          </div>
-          <div className="metric-card">
-            <div className="metric-value">{(avgConfidence * 100).toFixed(1)}%</div>
-            <div className="metric-label">Avg Confidence</div>
-          </div>
-          <div className="metric-card">
-            <div className="metric-value">{Object.keys(classificationCounts).length}</div>
-            <div className="metric-label">Types Caught</div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        {/* Summary Metrics */}
+        <div className="content-card">
+          <h2>Summary</h2>
+          <div className="metrics-grid">
+            <div className="metric-card">
+              <div className="metric-value">{totalScans}</div>
+              <div className="metric-label">Total Scans</div>
+            </div>
+            <div className="metric-card">
+              <div className="metric-value">{recentScans}</div>
+              <div className="metric-label">Recent Scans</div>
+            </div>
+            <div className="metric-card">
+              <div className="metric-value">{(avgConfidence * 100).toFixed(1)}%</div>
+              <div className="metric-label">Avg Confidence</div>
+            </div>
+            <div className="metric-card">
+              <div className="metric-value">{Object.keys(classificationCounts).length}</div>
+              <div className="metric-label">Types Detected</div>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Charts */}
-      <div className="beach-card">
-        <h3>📈 Catch Analytics</h3>
-        <div className="charts-container">
-          {/* Pie Chart */}
-          <div className="chart-section">
-            <h4>🐟 Catch Types Distribution</h4>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={chartData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {chartData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Bar Chart */}
-          <div className="chart-section">
-            <h4>📊 Recent Confidence Scores</h4>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={confidenceData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="confidence" fill="#0ea5e9" />
-              </BarChart>
-            </ResponsiveContainer>
+        {/* Charts */}
+        <div className="content-card">
+          <h2>Analysis Charts</h2>
+          <div className="metrics-grid">
+            <div className="metric-card">
+              <h3>Classification Distribution</h3>
+              <ResponsiveContainer width="100%" height={200}>
+                <PieChart>
+                  <Pie
+                    data={chartData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={60}
+                    dataKey="value"
+                    label={({ name, value }) => `${name}: ${value}`}
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="metric-card">
+              <h3>Confidence Scores</h3>
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={confidenceData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="confidence" fill="#166534" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Scan List */}
-      <div className="beach-card">
-        <h3>🎣 Recent Catches</h3>
-        <div className="scans-list">
-          {scans.map((scan, index) => (
-            <motion.div
-              key={index}
-              className="scan-item"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.1 }}
-            >
-              <div className="scan-header">
-                <span className="scan-icon">
-                  {getClassificationIcon(scan.classification)}
-                </span>
-                <span className="scan-type">
-                  {scan.classification.toUpperCase()}
-                </span>
-                <span className="scan-confidence">
-                  {(scan.confidence * 100).toFixed(1)}%
-                </span>
-                <span className="scan-date">
-                  {new Date(scan.timestamp).toLocaleDateString()}
-                </span>
-                <button
-                  className="btn btn-secondary btn-sm"
-                  onClick={() => setSelectedScan(selectedScan === index ? null : index)}
-                >
-                  {selectedScan === index ? 'Hide' : 'View'} Details
-                </button>
-              </div>
-              
-              {selectedScan === index && (
-                <motion.div
-                  className="scan-details"
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                >
-                  <ResultDisplay result={scan} />
-                </motion.div>
-              )}
-            </motion.div>
-          ))}
+        {/* Recent Scans */}
+        <div className="content-card">
+          <h2>Recent Scans</h2>
+          <div className="scan-list">
+            {scans.map((scan, index) => (
+              <motion.div
+                key={index}
+                className="scan-item"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
+                onClick={() => setSelectedScan(selectedScan === index ? null : index)}
+              >
+                <div className="scan-header">
+                  <div className="scan-classification">
+                    <span className="classification-badge" style={{ backgroundColor: getClassificationColor(scan.classification) }}>
+                      {scan.classification.toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="scan-timestamp">
+                    {new Date(scan.timestamp).toLocaleString()}
+                  </div>
+                </div>
+                <div className="scan-content">
+                  <p>{scan.content.substring(0, 100)}...</p>
+                </div>
+                <div className="scan-confidence">
+                  Confidence: {(scan.confidence * 100).toFixed(1)}%
+                </div>
+                
+                {selectedScan === index && (
+                  <motion.div
+                    className="scan-details"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                  >
+                    <ResultDisplay result={scan} />
+                  </motion.div>
+                )}
+              </motion.div>
+            ))}
+          </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 };
 

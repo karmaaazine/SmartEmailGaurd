@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
 
 const Statistics = () => {
   const [stats, setStats] = useState(null);
@@ -21,7 +21,7 @@ const Statistics = () => {
       });
       setStats(response.data);
     } catch (err) {
-      setError('Failed to load beach patrol statistics.');
+      setError('Failed to load analytics statistics.');
     } finally {
       setLoading(false);
     }
@@ -29,9 +29,9 @@ const Statistics = () => {
 
   const getClassificationColor = (classification) => {
     switch (classification) {
-      case 'legitimate': return '#34d399';
+      case 'legitimate': return '#22c55e';
       case 'suspicious': return '#fbbf24';
-      case 'spam': return '#fb7185';
+      case 'spam': return '#ec4899';
       case 'phishing': return '#dc2626';
       default: return '#6b7280';
     }
@@ -49,27 +49,47 @@ const Statistics = () => {
 
   if (loading) {
     return (
-      <div className="beach-card text-center">
-        <div className="loading-spinner"></div>
-        <p>🌊 Loading beach patrol statistics...</p>
+      <div className="page-container">
+        <div className="page-hero">
+          <h1>Analytics Dashboard</h1>
+          <p>Comprehensive insights into your email security patterns and performance.</p>
+        </div>
+        <div className="text-center">
+          <div className="loading-spinner"></div>
+          <p>Loading analytics...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="beach-card">
-        <h3>⚠️ Error</h3>
-        <p>{error}</p>
+      <div className="page-container">
+        <div className="page-hero">
+          <h1>Analytics Dashboard</h1>
+          <p>Comprehensive insights into your email security patterns and performance.</p>
+        </div>
+        <div className="content-card">
+          <div className="result-box result-suspicious">
+            <h3>⚠️ Error</h3>
+            <p>{error}</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (!stats) {
     return (
-      <div className="beach-card text-center">
-        <h2>📈 Beach Patrol Stats</h2>
-        <p>🌊 No statistics available yet.</p>
+      <div className="page-container">
+        <div className="page-hero">
+          <h1>Analytics Dashboard</h1>
+          <p>Comprehensive insights into your email security patterns and performance.</p>
+        </div>
+        <div className="content-card text-center">
+          <h2>No Data Available</h2>
+          <p>Start scanning emails to see analytics here.</p>
+        </div>
       </div>
     );
   }
@@ -95,143 +115,141 @@ const Statistics = () => {
     : [];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-    >
-      <div className="beach-card">
-        <h2>📈 Beach Patrol Stats</h2>
-        <p>Your security lifeguard statistics and performance metrics</p>
+    <div className="page-container">
+      <div className="page-hero">
+        <h1>Analytics Dashboard</h1>
+        <p>Comprehensive insights into your email security patterns and performance.</p>
       </div>
 
-      {/* Overall Stats */}
-      <div className="beach-card">
-        <h3>🏖️ Overall Performance</h3>
-        <div className="metrics-grid">
-          <div className="metric-card">
-            <div className="metric-value">{stats.total_scans}</div>
-            <div className="metric-label">Total Scans</div>
-          </div>
-          {stats.recent_activity?.last_24_hours && (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        {/* Overall Stats */}
+        <div className="content-card">
+          <h2>Overall Statistics</h2>
+          <div className="metrics-grid">
             <div className="metric-card">
-              <div className="metric-value">{stats.recent_activity.last_24_hours}</div>
-              <div className="metric-label">Last 24 Hours</div>
+              <div className="metric-value">{stats.total_scans}</div>
+              <div className="metric-label">Total Scans</div>
             </div>
-          )}
-          {stats.recent_activity?.average_confidence && (
+            {stats.recent_activity?.last_24_hours && (
+              <div className="metric-card">
+                <div className="metric-value">{stats.recent_activity.last_24_hours}</div>
+                <div className="metric-label">Last 24 Hours</div>
+              </div>
+            )}
+            {stats.recent_activity?.average_confidence && (
+              <div className="metric-card">
+                <div className="metric-value">{(stats.recent_activity.average_confidence * 100).toFixed(1)}%</div>
+                <div className="metric-label">Avg Confidence</div>
+              </div>
+            )}
             <div className="metric-card">
-              <div className="metric-value">{(stats.recent_activity.average_confidence * 100).toFixed(1)}%</div>
-              <div className="metric-label">Avg Confidence</div>
+              <div className="metric-value">{classificationData.length}</div>
+              <div className="metric-label">Types Detected</div>
             </div>
-          )}
-          <div className="metric-card">
-            <div className="metric-value">{classificationData.length}</div>
-            <div className="metric-label">Types Detected</div>
           </div>
         </div>
-      </div>
 
-      {/* Classification Breakdown */}
-      {classificationData.length > 0 && (
-        <div className="beach-card">
-          <h3>🐟 Catch Types Analysis</h3>
-          <div className="classification-grid">
-            {classificationData.map((item, index) => (
-              <motion.div
-                key={item.name}
-                className="classification-card"
-                style={{ borderColor: item.color }}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <div className="classification-icon">{item.icon}</div>
-                <div className="classification-name">{item.name}</div>
-                <div className="classification-count">{item.count}</div>
-                <div className="classification-percentage">
-                  {((item.count / stats.total_scans) * 100).toFixed(1)}%
-                </div>
-              </motion.div>
-            ))}
+        {/* Classification Breakdown */}
+        {classificationData.length > 0 && (
+          <div className="content-card">
+            <h2>Classification Analysis</h2>
+            <div className="metrics-grid">
+              {classificationData.map((item, index) => (
+                <motion.div
+                  key={item.name}
+                  className="metric-card"
+                  style={{ borderColor: item.color }}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <div className="metric-value">{item.icon}</div>
+                  <div className="metric-label">{item.name}</div>
+                  <div className="metric-value">{item.count}</div>
+                  <div className="metric-label">
+                    {((item.count / stats.total_scans) * 100).toFixed(1)}%
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Activity Chart */}
+        {recentActivityData.length > 0 && (
+          <div className="content-card">
+            <h2>Recent Activity (24 Hours)</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <AreaChart data={recentActivityData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="time" />
+                <YAxis />
+                <Tooltip />
+                <Area 
+                  type="monotone" 
+                  dataKey="scans" 
+                  stroke="#166534" 
+                  fill="#166534" 
+                  fillOpacity={0.3}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+
+        {/* Performance Insights */}
+        <div className="content-card">
+          <h2>Performance Insights</h2>
+          <div className="metrics-grid">
+            <div className="metric-card">
+              <h3>Security Coverage</h3>
+              <p>Your system monitors emails across multiple threat categories, providing comprehensive protection against phishing, spam, and suspicious content.</p>
+            </div>
+            <div className="metric-card">
+              <h3>Response Time</h3>
+              <p>Average analysis time is under 2 seconds, ensuring quick detection and response to potential threats.</p>
+            </div>
+            <div className="metric-card">
+              <h3>Accuracy Rate</h3>
+              <p>High confidence scores indicate reliable threat detection with minimal false positives.</p>
+            </div>
+            <div className="metric-card">
+              <h3>Continuous Monitoring</h3>
+              <p>24/7 monitoring ensures your email security is always active and protecting your digital communications.</p>
+            </div>
           </div>
         </div>
-      )}
 
-      {/* Activity Chart */}
-      {recentActivityData.length > 0 && (
-        <div className="beach-card">
-          <h3>📊 Recent Activity (24 Hours)</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={recentActivityData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="time" />
-              <YAxis />
-              <Tooltip />
-              <Area 
-                type="monotone" 
-                dataKey="scans" 
-                stroke="#0ea5e9" 
-                fill="#0ea5e9" 
-                fillOpacity={0.3}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-      )}
-
-      {/* Performance Metrics */}
-      <div className="beach-card">
-        <h3>🎯 Performance Insights</h3>
-        <div className="insights-grid">
-          <div className="insight-card">
-            <h4>🛡️ Security Coverage</h4>
-            <p>Your lifeguards are monitoring emails across multiple threat categories, providing comprehensive protection against phishing, spam, and suspicious content.</p>
-          </div>
-          <div className="insight-card">
-            <h4>⚡ Response Time</h4>
-            <p>Average analysis time is under 2 seconds, ensuring quick detection and response to potential threats.</p>
-          </div>
-          <div className="insight-card">
-            <h4>🎯 Accuracy Rate</h4>
-            <p>High confidence scores indicate reliable threat detection with minimal false positives.</p>
-          </div>
-          <div className="insight-card">
-            <h4>🌊 Continuous Monitoring</h4>
-            <p>24/7 beach patrol ensures your email security is always active and protecting your digital shores.</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Recommendations */}
-      <div className="beach-card">
-        <h3>💡 Security Recommendations</h3>
-        <div className="recommendations-list">
-          <div className="recommendation-item">
-            <span className="recommendation-icon">🎣</span>
-            <div className="recommendation-content">
-              <h4>Regular Scanning</h4>
+        {/* Security Recommendations */}
+        <div className="content-card">
+          <h2>Security Recommendations</h2>
+          <div className="metrics-grid">
+            <div className="metric-card">
+              <h3>Regular Scanning</h3>
               <p>Scan suspicious emails regularly to maintain awareness of current threats.</p>
             </div>
-          </div>
-          <div className="recommendation-item">
-            <span className="recommendation-icon">🦈</span>
-            <div className="recommendation-content">
-              <h4>Stay Updated</h4>
+            <div className="metric-card">
+              <h3>Stay Updated</h3>
               <p>Keep your security knowledge current by reviewing the latest phishing techniques.</p>
             </div>
-          </div>
-          <div className="recommendation-item">
-            <span className="recommendation-icon">🏖️</span>
-            <div className="recommendation-content">
-              <h4>Share Knowledge</h4>
+            <div className="metric-card">
+              <h3>Share Knowledge</h3>
               <p>Educate your team about email security best practices and common threats.</p>
+            </div>
+            <div className="metric-card">
+              <h3>Monitor Trends</h3>
+              <p>Pay attention to emerging threat patterns and adjust your security measures accordingly.</p>
             </div>
           </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 };
 
+export default Statistics; 
 export default Statistics; 

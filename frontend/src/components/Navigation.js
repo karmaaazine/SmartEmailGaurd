@@ -7,10 +7,11 @@ const Navigation = () => {
   const location = useLocation();
 
   const navItems = [
-    { path: '/', label: '🎣 Scanner', icon: '🎣' },
-    { path: '/history', label: '📊 History', icon: '📊' },
-    { path: '/stats', label: '📈 Stats', icon: '📈' },
-    { path: '/about', label: 'ℹ️ About', icon: 'ℹ️' }
+    { path: '/', label: 'Product' },
+    { path: '/scanner', label: 'Scanner' },
+    { path: '/history', label: 'History' },
+    { path: '/stats', label: 'Analytics' },
+    { path: '/about', label: 'About' }
   ];
 
   const toggleMenu = () => {
@@ -21,7 +22,8 @@ const Navigation = () => {
     <nav className="nav-container">
       <div className="nav-content">
         <Link to="/" className="nav-logo">
-          🎣 Catch a Phish!
+          <div className="nav-logo-icon">C</div>
+          Catch a Phish!
         </Link>
         
         {/* Desktop Navigation */}
@@ -37,6 +39,12 @@ const Navigation = () => {
             </li>
           ))}
         </ul>
+
+        {/* Desktop Actions */}
+        <div className="nav-actions">
+          <Link to="/about" className="nav-signin">Sign In</Link>
+          <Link to="/scanner" className="nav-get-started">Get Started</Link>
+        </div>
 
         {/* Mobile Menu Button */}
         <button className="mobile-menu-btn" onClick={toggleMenu}>
@@ -59,6 +67,24 @@ const Navigation = () => {
                 </Link>
               </li>
             ))}
+            <li>
+              <Link
+                to="/about"
+                className="mobile-nav-link"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Sign In
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/scanner"
+                className="mobile-nav-link"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Get Started
+              </Link>
+            </li>
           </ul>
         </div>
       )}

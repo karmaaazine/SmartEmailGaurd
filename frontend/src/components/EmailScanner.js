@@ -12,7 +12,6 @@ const EmailScanner = () => {
 
   const sampleEmails = {
     'safe': {
-      icon: '🐠',
       label: 'Safe Email',
       content: `Hi John,
 
@@ -24,7 +23,6 @@ Best regards,
 Sarah`
     },
     'suspicious': {
-      icon: '🦈',
       label: 'Suspicious Email',
       content: `Dear Customer,
 
@@ -38,7 +36,6 @@ Best regards,
 Security Team`
     },
     'phishing': {
-      icon: '🦑',
       label: 'Phishing Email',
       content: `URGENT: Your account has been COMPROMISED!
 
@@ -61,7 +58,6 @@ Best regards,
 Bank Security Team`
     },
     'spam': {
-      icon: '🐙',
       label: 'Spam Email',
       content: `🔥🔥🔥 LIMITED TIME OFFER! 🔥🔥🔥
 
@@ -126,60 +122,59 @@ Marketing Team`
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-    >
-      <div className="beach-card">
-        <h2>🎣 Cast Your Net</h2>
-        <p>Drop your suspicious email into our security net and let our AI lifeguards analyze it!</p>
+    <div className="page-container">
+      <div className="page-hero">
+        <h1>Email Security Scanner</h1>
+        <p>Analyze your emails for phishing, spam, and security threats using our AI-powered detection system.</p>
       </div>
 
-      {/* Input Method Selection */}
-      <div className="beach-card">
-        <h3>🌊 Choose Your Fishing Method</h3>
-        <div className="input-method-selector">
-          <label className="method-option">
-            <input
-              type="radio"
-              name="inputMethod"
-              value="manual"
-              checked={inputMethod === 'manual'}
-              onChange={(e) => setInputMethod(e.target.value)}
-            />
-            <span className="method-label">📝 Manual Cast</span>
-          </label>
-          <label className="method-option">
-            <input
-              type="radio"
-              name="inputMethod"
-              value="file"
-              checked={inputMethod === 'file'}
-              onChange={(e) => setInputMethod(e.target.value)}
-            />
-            <span className="method-label">📁 File Drop</span>
-          </label>
+      <motion.div
+        className="form-container"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        {/* Input Method Selection */}
+        <div className="form-group">
+          <label className="form-label">Choose Input Method</label>
+          <div className="input-method-selector">
+            <label className="method-option">
+              <input
+                type="radio"
+                name="inputMethod"
+                value="manual"
+                checked={inputMethod === 'manual'}
+                onChange={(e) => setInputMethod(e.target.value)}
+              />
+              <span className="method-label">Manual Input</span>
+            </label>
+            <label className="method-option">
+              <input
+                type="radio"
+                name="inputMethod"
+                value="file"
+                checked={inputMethod === 'file'}
+                onChange={(e) => setInputMethod(e.target.value)}
+              />
+              <span className="method-label">File Upload</span>
+            </label>
+          </div>
         </div>
-      </div>
 
-      {/* Email Input */}
-      <div className="beach-card">
-        <h3>🌊 Drop Your Email Here</h3>
-        
+        {/* Email Input */}
         {inputMethod === 'manual' ? (
           <div className="form-group">
-            <label className="form-label">Email Content:</label>
+            <label className="form-label">Email Content</label>
             <textarea
               className="form-textarea"
               value={emailContent}
               onChange={(e) => setEmailContent(e.target.value)}
-              placeholder="Drop your suspicious email here and let our lifeguards check it out! 🏖️"
+              placeholder="Paste your email content here to analyze for security threats..."
             />
           </div>
         ) : (
           <div className="form-group">
-            <label className="form-label">Upload Email File:</label>
+            <label className="form-label">Upload Email File</label>
             <input
               type="file"
               accept=".txt,.eml"
@@ -188,7 +183,7 @@ Marketing Team`
             />
             {emailContent && (
               <div className="mt-2">
-                <label className="form-label">File Content Preview:</label>
+                <label className="form-label">File Content Preview</label>
                 <textarea
                   className="form-textarea"
                   value={emailContent}
@@ -201,9 +196,8 @@ Marketing Team`
         )}
 
         {/* Sample Emails */}
-        <div className="sample-emails">
-          <h4>🧪 Test Waters</h4>
-          <p>Try these sample emails to test our security net:</p>
+        <div className="form-group">
+          <label className="form-label">Test with Sample Emails</label>
           <div className="sample-buttons">
             {Object.entries(sampleEmails).map(([type, email]) => (
               <button
@@ -211,56 +205,56 @@ Marketing Team`
                 className="btn btn-secondary sample-btn"
                 onClick={() => handleSampleEmail(type)}
               >
-                {email.icon} {email.label}
+                {email.label}
               </button>
             ))}
           </div>
         </div>
-      </div>
 
-      {/* Scan Button */}
-      <div className="text-center">
-        <button
-          className="btn btn-primary"
-          onClick={scanEmail}
-          disabled={isLoading || !emailContent.trim()}
-        >
-          {isLoading ? (
-            <>
-              <span className="loading-spinner"></span>
-              🌊 Our lifeguards are analyzing your email...
-            </>
-          ) : (
-            '🎣 Cast Security Net'
-          )}
-        </button>
-      </div>
+        {/* Scan Button */}
+        <div className="text-center">
+          <button
+            className="btn btn-primary"
+            onClick={scanEmail}
+            disabled={isLoading || !emailContent.trim()}
+          >
+            {isLoading ? (
+              <>
+                <span className="loading-spinner"></span>
+                Analyzing email...
+              </>
+            ) : (
+              'Scan Email'
+            )}
+          </button>
+        </div>
 
-      {/* Error Display */}
-      {error && (
-        <motion.div
-          className="error-message"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <div className="beach-card">
-            <h3>⚠️ Error</h3>
-            <p>{error}</p>
-          </div>
-        </motion.div>
-      )}
+        {/* Error Display */}
+        {error && (
+          <motion.div
+            className="error-message"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <div className="result-box result-suspicious">
+              <h3>⚠️ Error</h3>
+              <p>{error}</p>
+            </div>
+          </motion.div>
+        )}
 
-      {/* Result Display */}
-      {result && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <ResultDisplay result={result} />
-        </motion.div>
-      )}
-    </motion.div>
+        {/* Result Display */}
+        {result && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <ResultDisplay result={result} />
+          </motion.div>
+        )}
+      </motion.div>
+    </div>
   );
 };
 
