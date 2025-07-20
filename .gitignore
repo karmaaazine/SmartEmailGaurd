@@ -322,6 +322,3 @@ docs/build/
 ehthumbs.db
 Thumbs.db 
 
-.frontend/
-.test/
-.gmail_integration/
