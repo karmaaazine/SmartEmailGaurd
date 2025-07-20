@@ -80,7 +80,7 @@ st.markdown("""
     
     /* Card styling */
     .beach-card {
-        background: rgba(255, 255, 255, 0.95);
+        background: linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%);
         border-radius: 20px;
         padding: 2rem;
         margin: 1rem 0;
@@ -313,7 +313,7 @@ def show_email_scanner():
     """Show the main email scanner interface with beach theme."""
     st.markdown("""
     <div class="beach-card">
-        <h2 style="color: #1e3a8a;">🎣 Cast Your Net</h2>
+        <h2 style="color: #6b7280;">🎣 Cast Your Net</h2>
         <p style="color: #374151;">Drop your suspicious email into our security net and let our AI lifeguards analyze it!</p>
     </div>
     """, unsafe_allow_html=True)
