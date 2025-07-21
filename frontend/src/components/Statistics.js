@@ -8,20 +8,43 @@ const Statistics = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Determine API base URL - try HTTPS first, fallback to HTTP
+  const getApiBaseUrl = () => {
+    const protocol = window.location.protocol;
+    const hostname = window.location.hostname;
+    
+    // If we're on HTTPS, try HTTPS API first
+    if (protocol === 'https:') {
+      return `https://${hostname}:8443`;
+    }
+    
+    // Fallback to HTTP
+    return `http://${hostname}:8000`;
+  };
+
   useEffect(() => {
     fetchStats();
   }, []);
 
   const fetchStats = async () => {
     try {
-      const response = await axios.get('/stats', {
+      const apiBaseUrl = getApiBaseUrl();
+      const response = await axios.get(`${apiBaseUrl}/stats`, {
         headers: {
           'x-api-key': 'salmas_email_guard'
-        }
+        },
+        // Handle self-signed certificates in development
+        httpsAgent: window.location.protocol === 'https:' ? {
+          rejectUnauthorized: false
+        } : undefined
       });
       setStats(response.data);
     } catch (err) {
-      setError('Failed to load analytics statistics.');
+      if (err.code === 'CERT_HAS_EXPIRED' || err.code === 'UNABLE_TO_VERIFY_LEAF_SIGNATURE') {
+        setError('SSL certificate issue. This is normal for development with self-signed certificates.');
+      } else {
+        setError('Failed to load analytics statistics.');
+      }
     } finally {
       setLoading(false);
     }
@@ -251,5 +274,4 @@ const Statistics = () => {
   );
 };
 
-export default Statistics; 
 export default Statistics; 

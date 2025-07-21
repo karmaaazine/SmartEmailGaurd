@@ -1,6 +1,6 @@
 """
 FastAPI Backend for Smart Email Guardian
-Provides REST API endpoints for email analysis and history.
+Provides REST API endpoints for email analysis and history with HTTPS support.
 """
 
 import os
@@ -11,6 +11,8 @@ from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from pydantic import BaseModel, Field
 import uvicorn
 
@@ -25,16 +27,21 @@ from ai.email_guard import analyze_email
 API_KEY = os.getenv("EMAIL_GUARD_API_KEY", "salmas_email_guard")
 MAX_EMAIL_LENGTH = 10000  # Maximum email content length
 
+# SSL Configuration
+SSL_CERT_FILE = os.getenv("SSL_CERT_FILE", "../ssl/certificate.pem")
+SSL_KEY_FILE = os.getenv("SSL_KEY_FILE", "../ssl/private_key.pem")
+SSL_ENABLED = os.getenv("SSL_ENABLED", "true").lower() == "true"
+
 # In-memory storage for scan history (in production, use a database)
 scan_history: List[Dict] = []
 
 app = FastAPI(
     title="Smart Email Guardian API",
-    description="AI-powered email spam and phishing detection API",
+    description="AI-powered email spam and phishing detection API with HTTPS support",
     version="1.0.0"
 )
 
-# Add CORS middleware
+# Add security middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # In production, specify your frontend domain
@@ -42,6 +49,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Add trusted host middleware for security
+app.add_middleware(
+    TrustedHostMiddleware,
+    allowed_hosts=["localhost", "127.0.0.1", "*.localhost", "*.127.0.0.1"]
+)
+
+# Add HTTPS redirect middleware if SSL is enabled
+if SSL_ENABLED:
+    app.add_middleware(HTTPSRedirectMiddleware)
 
 # Pydantic models
 class EmailScanRequest(BaseModel):
@@ -91,10 +108,12 @@ async def root():
     return {
         "message": "Smart Email Guardian API",
         "version": "1.0.0",
+        "ssl_enabled": SSL_ENABLED,
         "endpoints": {
             "POST /scan": "Analyze email content",
             "GET /history": "Get scan history",
-            "GET /health": "Health check"
+            "GET /health": "Health check",
+            "GET /ssl-info": "SSL certificate information"
         }
     }
 
@@ -104,8 +123,46 @@ async def health_check():
     return {
         "status": "healthy",
         "timestamp": datetime.now().isoformat(),
-        "model_loaded": True
+        "ssl_enabled": SSL_ENABLED,
+        "ssl_cert_file": SSL_CERT_FILE if SSL_ENABLED else None
     }
+
+@app.get("/ssl-info")
+async def ssl_info():
+    """Get SSL certificate information."""
+    if not SSL_ENABLED:
+        return {"ssl_enabled": False, "message": "SSL is not enabled"}
+    
+    try:
+        import ssl
+        import socket
+        
+        # Create SSL context
+        context = ssl.create_default_context()
+        context.check_hostname = False
+        context.verify_mode = ssl.CERT_NONE
+        
+        # Connect to self to get certificate info
+        with socket.create_connection(('localhost', 8443)) as sock:
+            with context.wrap_socket(sock, server_hostname='localhost') as ssock:
+                cert = ssock.getpeercert()
+                return {
+                    "ssl_enabled": True,
+                    "certificate": {
+                        "subject": dict(x[0] for x in cert['subject']),
+                        "issuer": dict(x[0] for x in cert['issuer']),
+                        "version": cert['version'],
+                        "serial_number": cert['serialNumber'],
+                        "not_before": cert['notBefore'],
+                        "not_after": cert['notAfter'],
+                        "san": cert.get('subjectAltName', [])
+                    }
+                }
+    except Exception as e:
+        return {
+            "ssl_enabled": True,
+            "error": f"Could not retrieve certificate info: {str(e)}"
+        }
 
 @app.post("/scan", response_model=EmailScanResponse)
 async def scan_email(
@@ -113,37 +170,35 @@ async def scan_email(
     api_key: str = Depends(verify_api_key)
 ):
     """
-    Analyze email content for spam, phishing, and security threats.
+    Analyze email content for spam and phishing detection.
     
     Args:
-        request: Email content to analyze
+        request: EmailScanRequest containing email content
         api_key: API key for authentication
         
     Returns:
         EmailScanResponse: Analysis results
     """
     try:
-        # Analyze the email
-        analysis_result = analyze_email(request.content)
+        # Analyze email using AI model
+        result = analyze_email(request.content)
         
-        # Create scan record
-        scan_id = generate_scan_id()
-        scan_record = {
-            "id": scan_id,
+        # Create scan response
+        scan_data = {
+            "id": generate_scan_id(),
             "timestamp": datetime.now().isoformat(),
-            "classification": analysis_result["classification"],
-            "confidence": analysis_result["confidence"],
-            "explanation": analysis_result["explanation"],
-            "features": analysis_result["features"],
-            "indicators": analysis_result["indicators"],
-            "user_id": request.user_id,
-            "raw_content_length": len(request.content)
+            "classification": result["classification"],
+            "confidence": result["confidence"],
+            "explanation": result["explanation"],
+            "features": result.get("features", {}),
+            "indicators": result.get("indicators", []),
+            "user_id": request.user_id
         }
         
-        # Store in history
-        store_scan_result(scan_record)
+        # Store scan result
+        store_scan_result(scan_data)
         
-        return EmailScanResponse(**scan_record)
+        return EmailScanResponse(**scan_data)
         
     except Exception as e:
         raise HTTPException(
@@ -237,10 +292,39 @@ async def get_stats(api_key: str = Depends(verify_api_key)):
         )
 
 if __name__ == "__main__":
-    uvicorn.run(
-        "app:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True,
-        log_level="info"
-    ) 
+    # Check if SSL certificates exist
+    ssl_context = None
+    if SSL_ENABLED:
+        cert_path = os.path.abspath(SSL_CERT_FILE)
+        key_path = os.path.abspath(SSL_KEY_FILE)
+        
+        if os.path.exists(cert_path) and os.path.exists(key_path):
+            ssl_context = (cert_path, key_path)
+            print(f"🔒 SSL enabled with certificate: {cert_path}")
+        else:
+            print(f"⚠️ SSL certificates not found. Running without HTTPS.")
+            print(f"   Certificate: {cert_path}")
+            print(f"   Private key: {key_path}")
+            SSL_ENABLED = False
+    
+    # Run the server
+    if SSL_ENABLED and ssl_context:
+        print("🚀 Starting HTTPS server on https://localhost:8443")
+        uvicorn.run(
+            "app:app",
+            host="0.0.0.0",
+            port=8443,
+            ssl_certfile=ssl_context[0],
+            ssl_keyfile=ssl_context[1],
+            reload=True,
+            log_level="info"
+        )
+    else:
+        print("🚀 Starting HTTP server on http://localhost:8000")
+        uvicorn.run(
+            "app:app",
+            host="0.0.0.0",
+            port=8000,
+            reload=True,
+            log_level="info"
+        ) 

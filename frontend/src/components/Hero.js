@@ -37,51 +37,22 @@ const Hero = () => {
         </motion.div>
       </div>
 
-      <div className="hero-visual">
-        <motion.div
-          className="woman-illustration"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, delay: 0.5 }}
-        >
-          <div className="woman-outline">
-            {/* Woman's hair */}
-            <div className="woman-hair"></div>
-            
-            {/* Woman's head */}
-            <div className="woman-head">
-              {/* Eyes */}
-              <div className="woman-eyes">
-                <div className="eye"></div>
-                <div className="eye"></div>
-              </div>
-              {/* Nose */}
-              <div className="woman-nose"></div>
-            </div>
-            
-            {/* Woman's body */}
-            <div className="woman-body"></div>
-            
-            {/* Woman's arms */}
-            <div className="woman-arms">
-              <div className="arm-left"></div>
-              <div className="arm-right"></div>
-            </div>
-            
-            {/* Smartphone */}
-            <div className="smartphone">
-              <div className="smartphone-screen"></div>
-              <div className="smartphone-camera"></div>
-            </div>
-            
-            {/* Woman's legs */}
-            <div className="woman-legs">
-              <div className="leg-left"></div>
-              <div className="leg-right"></div>
-            </div>
-          </div>
-        </motion.div>
-      </div>
+    <div className="hero-visual">
+      <motion.div
+        className="photo-wrapper"
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1, delay: 0.5 }}
+      >
+        <img
+          src="/woman.png"
+          alt="Woman holding smartphone illustration"
+          className="photo-image"
+          style={{ maxWidth: '100%', height: 'auto' }}
+        />
+      </motion.div>
+    </div>
+
     </section>
   );
 };

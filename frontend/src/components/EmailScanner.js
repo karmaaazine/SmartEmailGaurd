@@ -10,6 +10,20 @@ const EmailScanner = () => {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
+  // Determine API base URL - try HTTPS first, fallback to HTTP
+  const getApiBaseUrl = () => {
+    const protocol = window.location.protocol;
+    const hostname = window.location.hostname;
+    
+    // If we're on HTTPS, try HTTPS API first
+    if (protocol === 'https:') {
+      return `https://${hostname}:8443`;
+    }
+    
+    // Fallback to HTTP
+    return `http://${hostname}:8000`;
+  };
+
   const sampleEmails = {
     'safe': {
       label: 'Safe Email',
@@ -104,18 +118,31 @@ Marketing Team`
     setResult(null);
 
     try {
-      const response = await axios.post('/scan', {
+      const apiBaseUrl = getApiBaseUrl();
+      const response = await axios.post(`${apiBaseUrl}/scan`, {
         content: emailContent,
         user_id: 'beach_user'
       }, {
         headers: {
           'x-api-key': 'salmas_email_guard'
-        }
+        },
+        // Handle self-signed certificates in development
+        httpsAgent: window.location.protocol === 'https:' ? {
+          rejectUnauthorized: false
+        } : undefined
       });
 
       setResult(response.data);
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to analyze email. Please check your connection.');
+      if (err.code === 'CERT_HAS_EXPIRED' || err.code === 'UNABLE_TO_VERIFY_LEAF_SIGNATURE') {
+        setError('SSL certificate issue. This is normal for development with self-signed certificates. Please accept the certificate warning in your browser.');
+      } else if (err.response?.data?.detail) {
+        setError(err.response.data.detail);
+      } else if (err.code === 'ECONNREFUSED') {
+        setError('Could not connect to the server. Please ensure the backend is running.');
+      } else {
+        setError(err.message || 'Failed to analyze email. Please check your connection.');
+      }
     } finally {
       setIsLoading(false);
     }
