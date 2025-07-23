@@ -102,7 +102,7 @@ def test_basic_functionality():
     print("\n🧪 Testing basic functionality...")
     
     try:
-        from ai.email_guard import analyze_email
+        from backend.ai.email_guard import analyze_email
         
         # Test legitimate email
         legitimate_email = """
