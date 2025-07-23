@@ -355,3 +355,4 @@ frontend/.vscode/
 frontend/*.swp
 frontend/*.swo
 
+backend/credentials.json
