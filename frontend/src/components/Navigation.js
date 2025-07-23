@@ -21,10 +21,15 @@ const Navigation = () => {
   return (
     <nav className="nav-container">
       <div className="nav-content">
-        <Link to="/" className="nav-logo">
-          <div className="nav-logo-icon">C</div>
-          Catch a Phish!
-        </Link>
+      <Link to="/" className="nav-logo">
+        <img
+          src="/logo.png"
+          alt="Catch a Phish Logo"
+          className="nav-logo-image"
+          style={{ height: '40px', width: '40px', marginRight: '10px', verticalAlign: 'middle' }}
+        />
+        Catch a Phish!
+      </Link>
         
         {/* Desktop Navigation */}
         <ul className="nav-links">

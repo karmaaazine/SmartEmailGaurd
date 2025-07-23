@@ -48,7 +48,12 @@ const Hero = () => {
           src="/woman.png"
           alt="Woman holding smartphone illustration"
           className="photo-image"
-          style={{ maxWidth: '100%', height: 'auto' }}
+          style={{
+            maxWidth: '300px',      // or another value that looks good
+            height: 'auto',
+            marginTop: '40px',      // pushes the image down from the nav
+            display: 'block'
+          }}
         />
       </motion.div>
     </div>
