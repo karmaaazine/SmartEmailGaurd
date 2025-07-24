@@ -9,7 +9,7 @@ Smart Email Guardian is a comprehensive email security solution that uses advanc
 - **🤖 AI-Powered Analysis**: Uses HuggingFace Transformers (DistilBERT) for intelligent email classification
 - **🛡️ Multi-Threat Detection**: Identifies spam, phishing, suspicious, and legitimate emails
 - **📊 Detailed Reports**: Provides confidence scores, explanations, and feature analysis
-- **🌐 Web Interface**: Beautiful Streamlit frontend for easy email analysis
+- **🌐 Web Interface**: Modern React frontend for easy email analysis
 - **🔧 CLI Tool**: Command-line interface for batch processing and automation
 - **📧 Gmail Integration**: Direct integration with Gmail API for inbox scanning
 - **📈 History Tracking**: Maintains scan history and provides statistics
@@ -24,7 +24,7 @@ Smart Email Guardian is a comprehensive email security solution that uses advanc
                                               └─────────────────┘
                                                        │
 ┌─────────────────┐    ┌─────────────────┐           │
-│   Streamlit     │◀───│   AI Module     │◀──────────┘
+│   React         │◀───│   AI Module     │◀──────────┘
 │   Frontend      │    │ email_guard.py  │
 └─────────────────┘    └─────────────────┘
 ```
@@ -85,13 +85,19 @@ python email_guard.py -f email.txt -o table
 
 ### 2. Web Interface
 
-**Start the backend:**
+**Start the full-stack app with Docker:**
+```bash
+docker build -t email-guardian .
+docker run -p 8000:8000 email-guardian
+```
+
+**Start the backend separately:**
 ```bash
 cd backend
 python app.py
 ```
 
-**Start the frontend:**
+**Start the frontend separately:**
 ```bash
 cd frontend
 npm install
@@ -99,8 +105,7 @@ npm start
 ```
 
 **Access the web interface:**
-- Frontend: http://localhost:8501
-- Backend API: http://localhost:8000
+- App: http://localhost:8000
 - API Docs: http://localhost:8000/docs
 
 ### 3. Gmail Integration
@@ -155,7 +160,8 @@ email_spam_detection_app/
 ├── backend/
 │   └── app.py                  # FastAPI backend
 ├── frontend/
-│   └── app.py                  # Streamlit frontend
+│   ├── src/                    # React source code
+│   └── ...                     # React frontend files
 ├── gmail_integration/
 │   └── gmail_reader.py         # Gmail API integration
 ├── tests/
@@ -199,21 +205,28 @@ All endpoints require the `x-api-key` header for authentication.
    uvicorn app:app --reload --host 0.0.0.0 --port 8000
    ```
 
-2. **Frontend:**
+2. **Frontend (React):**
    ```bash
    cd frontend
-   streamlit run app.py --server.port 8501
+   npm install
+   npm start
+   ```
+
+3. **Full-stack (Docker):**
+   ```bash
+   docker build -t email-guardian .
+   docker run -p 8000:8000 email-guardian
    ```
 
 ### Production Deployment
 
-**Using Docker:**
+**Using Docker (Full Stack):**
 ```bash
-# Build image
+# Build image (from project root)
 docker build -t email-guardian .
 
 # Run container
-docker run -p 8000:8000 -p 8501:8501 email-guardian
+docker run -p 8000:8000 email-guardian
 ```
 
 **Using Render.com:**
