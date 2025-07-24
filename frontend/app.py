@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import Dict, Optional
 
 # Configuration
-BACKEND_URL = "http://localhost:8000"
+BACKEND_URL = "https://b91bfbfe-d4e9-4b12-a824-674ad053dd74-00-1rb7hzb94ses.spock.replit.dev/"
 API_KEY = "salmas_email_guard"  # Updated to match backend
 
 # Page configuration
