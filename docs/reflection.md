@@ -21,11 +21,10 @@
   - FastAPI provides excellent automatic documentation
   - Pydantic models ensure data validation
   - Dependency injection simplifies authentication
-  - CORS middleware enables frontend integration
 - **Challenges**: API key management and security
 - **Solutions**: Header-based authentication with proper validation
 
-### 3. **Streamlit Frontend**
+### 3. **Streamlit Frontend** (used before switching to react)
 - **What I learned**: Creating interactive web applications with Python
 - **Key insights**:
   - Streamlit is excellent for data science applications
@@ -82,7 +81,7 @@
 - ✅ RESTful API backend
 - ✅ Interactive web frontend
 - ✅ CLI tool for automation
-- ✅ Gmail integration
+- ⚠️ Gmail integration
 - ✅ Comprehensive testing
 - ✅ Documentation and security notes
 
@@ -147,7 +146,7 @@
 - **Real-time updates**: Streamlit handles state efficiently
 - **User experience**: Responsive and intuitive interface
 
-## 🔒 Security Lessons
+## 🔒 Security Lessons (Working To Apply Them All)
 
 ### 1. **Input Validation**
 - **Lesson**: Always validate and sanitize user inputs
@@ -273,3 +272,4 @@ This project serves as a solid foundation for future email security applications
 ---
 
 **Built with passion for learning and security! 🛡️** 
+**From salma**

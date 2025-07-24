@@ -8,18 +8,9 @@ const Statistics = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Determine API base URL - try HTTPS first, fallback to HTTP
+  // Determine API base URL - use deployed backend
   const getApiBaseUrl = () => {
-    const protocol = window.location.protocol;
-    const hostname = window.location.hostname;
-    
-    // If we're on HTTPS, try HTTPS API first
-    if (protocol === 'https:') {
-      return `https://${hostname}:8443`;
-    }
-    
-    // Fallback to HTTP
-    return `http://${hostname}:8000`;
+    return "https://b91bfbfe-d4e9-4b12-a824-674ad053dd74-00-1rb7hzb94ses.spock.replit.dev";
   };
 
   useEffect(() => {

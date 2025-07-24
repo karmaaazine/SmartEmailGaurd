@@ -68,44 +68,10 @@ This document outlines security considerations, potential threats, and mitigatio
 
 ```bash
 # Required for production
-EMAIL_GUARD_API_KEY=your-very-secure-api-key-here
-GMAIL_CREDENTIALS_FILE=path/to/credentials.json
+EMAIL_GUARD_API_KEY=salmas_email_guard
+GMAIL_CREDENTIALS_FILE=gmail_integration/gmail_reader.py
 
-# Optional security enhancements
-ENABLE_RATE_LIMITING=true
-MAX_REQUESTS_PER_MINUTE=100
-ENABLE_LOGGING=true
-LOG_LEVEL=INFO
-```
-
-### API Security Headers
-
-```python
-# Add to FastAPI app
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["https://yourdomain.com"],  # Restrict origins
-    allow_credentials=True,
-    allow_methods=["GET", "POST"],
-    allow_headers=["x-api-key", "content-type"],
-)
-```
-
-### Input Validation
-
-```python
-# Example input validation
-class EmailScanRequest(BaseModel):
-    content: str = Field(
-        ..., 
-        min_length=1, 
-        max_length=10000,
-        regex=r'^[^\x00-\x08\x0B\x0C\x0E-\x1F\x7F]+$'  # No control characters
-    )
-    user_id: Optional[str] = Field(None, max_length=100)
-```
-
-## 🛡️ Security Best Practices
+## 🛡️ Security Best Practices (In The Future)
 
 ### 1. API Key Management
 
@@ -282,13 +248,6 @@ def test_oauth2_flow():
 - [FastAPI Security](https://fastapi.tiangolo.com/tutorial/security/)
 - [Gmail API Security](https://developers.google.com/gmail/api/auth)
 - [Python Security Best Practices](https://python-security.readthedocs.io/)
-
-## 📞 Security Contact
-
-For security issues or questions:
-- Create a GitHub issue with `[SECURITY]` prefix
-- Email: security@yourdomain.com
-- PGP Key: [Your PGP Key]
 
 ---
 
