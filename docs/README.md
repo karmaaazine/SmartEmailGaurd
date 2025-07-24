@@ -94,7 +94,8 @@ python app.py
 **Start the frontend:**
 ```bash
 cd frontend
-streamlit run app.py
+npm install
+npm start
 ```
 
 **Access the web interface:**
